@@ -119,6 +119,7 @@ open class FPNTextField: UITextField {
         phoneCodeLabel.translatesAutoresizingMaskIntoConstraints = false
         letfImageView.translatesAutoresizingMaskIntoConstraints = false
         letfImageView.contentMode = .scaleAspectFit
+        letfImageView.image = UIImage(named: "Arrow", in: Bundle.flagIcons, compatibleWith: nil)
 	}
 
 	private func setupPhoneCodeTextField() {

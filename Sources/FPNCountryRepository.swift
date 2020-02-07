@@ -20,7 +20,7 @@ open class FPNCountryRepository {
 
 	// Populates the metadata from the included json file resource
 	private func getAllCountries() -> [FPNCountry] {
-		let bundle: Bundle = Bundle.FlagPhoneNumber()
+		let bundle: Bundle = Bundle.flagPhoneNumber()
 		let resource: String = "countryCodes"
 		let jsonPath = bundle.path(forResource: resource, ofType: "json")
 

@@ -9,9 +9,9 @@ import Foundation
 
 public extension Bundle {
 
-	@objc static var FlagIcons = FlagPhoneNumber()
+	@objc static var flagIcons = flagPhoneNumber()
 
-	@objc static func FlagPhoneNumber() -> Bundle {
+	@objc static func flagPhoneNumber() -> Bundle {
 		let bundle = Bundle(for: FPNTextField.self)
 
 		if let path = bundle.path(forResource: "FlagPhoneNumber", ofType: "bundle") {
