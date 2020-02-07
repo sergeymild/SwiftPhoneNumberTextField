@@ -137,13 +137,13 @@ open class FPNTextField: UITextField {
         letfImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
         letfImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
         letfImageView.centerYAnchor.constraint(equalTo: leftView!.centerYAnchor, constant: 0).isActive = true
-        
-        flagButton.leftAnchor.constraint(equalTo: phoneCodeLabel.leftAnchor, constant: 0).isActive = true
-        flagButton.heightAnchor.constraint(equalTo: leftView!.heightAnchor, constant: 0).isActive = true
-        flagButton.rightAnchor.constraint(equalTo: letfImageView.rightAnchor, constant: 0).isActive = true
+
+        flagButton.leftAnchor.constraint(equalTo: phoneCodeLabel.leftAnchor).isActive = true
+        flagButton.topAnchor.constraint(equalTo: leftView!.topAnchor).isActive = true
+        flagButton.bottomAnchor.constraint(equalTo: leftView!.bottomAnchor).isActive = true
+        flagButton.rightAnchor.constraint(equalTo: letfImageView.rightAnchor).isActive = true
         
         phoneCodeTextField.widthAnchor.constraint(equalToConstant: 0).isActive = true
-//        phoneCodeTextField.leftAnchor.constraint(equalTo: flagButton.rightAnchor, constant: 16).isActive = true
         phoneCodeTextField.rightAnchor.constraint(equalTo: leftView!.rightAnchor, constant: 0).isActive = true
         
         phoneCodeTextField.topAnchor.constraint(equalTo: leftView!.topAnchor, constant: 0).isActive = true
