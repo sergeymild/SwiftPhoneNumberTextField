@@ -65,15 +65,6 @@ open class FPNTextField: UITextField {
 	/// Input Accessory View for the texfield
 	@objc open var textFieldInputAccessoryView: UIView?
 
-	open lazy var pickerView: FPNCountryPicker = FPNCountryPicker()
-
-	@objc public enum FPNDisplayMode: Int {
-		case picker
-		case list
-	}
-
-	@objc open var displayMode: FPNDisplayMode = .picker
-
 	init() {
 		super.init(frame: .zero)
 
@@ -102,7 +93,6 @@ open class FPNTextField: UITextField {
 		keyboardType = .numberPad
 		autocorrectionType = .no
 		addTarget(self, action: #selector(didEditText), for: .editingChanged)
-		addTarget(self, action: #selector(displayNumberKeyBoard), for: .touchDown)
 
 		if let regionCode = Locale.current.regionCode, let countryCode = FPNCountryCode(rawValue: regionCode) {
 			setFlag(countryCode: countryCode)
@@ -172,43 +162,8 @@ open class FPNTextField: UITextField {
 //		return newRect
 //	}
 
-	@objc private func displayNumberKeyBoard() {
-		switch displayMode {
-		case .picker:
-			tintColor = .gray
-			inputView = nil
-			inputAccessoryView = textFieldInputAccessoryView
-			reloadInputViews()
-		default:
-			break
-		}
-	}
-
 	@objc private func displayCountries() {
-		switch displayMode {
-		case .picker:
-			pickerView.setup(repository: countryRepository)
-
-			tintColor = .clear
-			inputView = pickerView
-			inputAccessoryView = getToolBar(with: getCountryListBarButtonItems())
-			reloadInputViews()
-			becomeFirstResponder()
-
-			pickerView.didSelect = { [weak self] country in
-				self?.fpnDidSelect(country: country)
-			}
-
-			if let selectedCountry = selectedCountry {
-				pickerView.setCountry(selectedCountry.code)
-			} else if let regionCode = Locale.current.regionCode, let countryCode = FPNCountryCode(rawValue: regionCode) {
-				pickerView.setCountry(countryCode)
-			} else if let firstCountry = countryRepository.countries.first {
-				pickerView.setCountry(firstCountry.code)
-			}
-		case .list:
-			(delegate as? FPNTextFieldDelegate)?.fpnDisplayCountryList()
-		}
+		(delegate as? FPNTextFieldDelegate)?.fpnDisplayCountryList()
 	}
 
 	@objc private func dismissCountries() {

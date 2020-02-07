@@ -8,10 +8,69 @@
 
 import UIKit
 
+class CountryTableViewCell: UITableViewCell {
+    let countryLabel: UILabel = {
+        let title = UILabel()
+        title.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        title.textColor = UIColor(red: 195 / 255.0, green: 195 / 255.0, blue: 195 / 255.0, alpha: 1.0)
+        return title
+    }()
+    
+    let phoneCodeLabel: UILabel = {
+        let title = UILabel()
+        title.textAlignment = .right
+        title.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        title.textColor = UIColor(red: 195 / 255.0, green: 195 / 255.0, blue: 195 / 255.0, alpha: 1.0)
+        return title
+    }()
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        backgroundColor = .clear
+        selectionStyle = .none
+        backgroundView = nil
+        selectedBackgroundView = nil
+        addSubview(countryLabel)
+        addSubview(phoneCodeLabel)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        countryLabel.frame = .init(
+            x: 16,
+            y: 0,
+            width: frame.width - 16,
+            height: frame.height
+        )
+        
+        phoneCodeLabel.frame = .init(
+            x: 0,
+            y: 0,
+            width: frame.width - 16,
+            height: frame.height
+        )
+    }
+    
+    func bind(_ country: FPNCountry, shouldShowPhoneCode: Bool) {
+        countryLabel.text = country.name
+
+        if shouldShowPhoneCode {
+            phoneCodeLabel.text = country.phoneCode
+        }
+    }
+}
+
 open class FPNCountryListViewController: UITableViewController, UISearchResultsUpdating, UISearchControllerDelegate {
 
 	open var repository: FPNCountryRepository?
 	open var showCountryPhoneCode: Bool = true
+    open var tableBackgroundColor: UIColor = .white
+    open var cellHighlightColor: UIColor = UIColor.lightGray.withAlphaComponent(0.1)
+    open var cellHeight: CGFloat = 45
 	open var searchController: UISearchController = UISearchController(searchResultsController: nil)
 	open var didSelect: ((FPNCountry) -> Void)?
 
@@ -19,10 +78,11 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 
 	override open func viewDidLoad() {
 		super.viewDidLoad()
-
+        tableView.register(CountryTableViewCell.self, forCellReuseIdentifier: "CountryTableViewCell")
 		tableView.tableFooterView = UIView()
 
 		initSearchBarController()
+        tableView.backgroundColor = tableBackgroundColor
 	}
 
 	open func setup(repository: FPNCountryRepository) {
@@ -32,12 +92,7 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 	private func initSearchBarController() {
 		searchController.searchResultsUpdater = self
 		searchController.delegate = self
-
-		if #available(iOS 9.1, *) {
-			searchController.obscuresBackgroundDuringPresentation = false
-		} else {
-			// Fallback on earlier versions
-		}
+        searchController.obscuresBackgroundDuringPresentation = false
 
 		if #available(iOS 11.0, *) {
 			navigationItem.searchController = searchController
@@ -75,15 +130,10 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 	}
 
 	override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CountryTableViewCell", for: indexPath) as! CountryTableViewCell
+		
 		let country = getItem(at: indexPath)
-
-		cell.imageView?.image = country.flag
-		cell.textLabel?.text = country.name
-
-		if showCountryPhoneCode {
-			cell.detailTextLabel?.text = country.phoneCode
-		}
+        cell.bind(country, shouldShowPhoneCode: showCountryPhoneCode)
 
 		return cell
 	}
@@ -99,6 +149,18 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 		searchController.searchBar.resignFirstResponder()
 		dismiss(animated: true, completion: nil)
 	}
+    
+    open override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        tableView.cellForRow(at: indexPath)?.backgroundColor = cellHighlightColor
+    }
+    
+    open override func tableView(_ tableView: UITableView, didUnhighlightRowAt indexPath: IndexPath) {
+        tableView.cellForRow(at: indexPath)?.backgroundColor = tableBackgroundColor
+    }
+    
+    open override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeight
+    }
 
 	// UISearchResultsUpdating
 
