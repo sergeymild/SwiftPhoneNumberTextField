@@ -46,8 +46,7 @@ class StackViewController: UIViewController {
 extension StackViewController: FPNTextFieldDelegate {
 
 	func fpnDisplayCountryList() {
-        let navigationViewController = UINavigationController(rootViewController: listController)
-        present(navigationViewController, animated: true, completion: nil)
+        navigationController?.pushViewController(listController, animated: true)
     }
 
 	func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {

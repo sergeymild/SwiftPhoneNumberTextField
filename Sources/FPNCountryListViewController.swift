@@ -20,7 +20,6 @@ class CountryTableViewCell: UITableViewCell {
         let title = UILabel()
         title.textAlignment = .right
         title.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        title.textColor = UIColor(red: 195 / 255.0, green: 195 / 255.0, blue: 195 / 255.0, alpha: 1.0)
         return title
     }()
     
@@ -55,10 +54,19 @@ class CountryTableViewCell: UITableViewCell {
         )
     }
     
-    func bind(_ country: FPNCountry, shouldShowPhoneCode: Bool) {
+    func bind(
+        _ country: FPNCountry,
+        shouldShowPhoneCode: Bool,
+        cellTextColor: UIColor,
+        cellTextFont: UIFont
+    ) {
+        countryLabel.font = cellTextFont
+        countryLabel.textColor = cellTextColor
         countryLabel.text = country.name
 
         if shouldShowPhoneCode {
+            phoneCodeLabel.font = cellTextFont
+            phoneCodeLabel.textColor = cellTextColor
             phoneCodeLabel.text = country.phoneCode
         }
     }
@@ -71,6 +79,8 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
     open var tableBackgroundColor: UIColor = .white
     open var cellHighlightColor: UIColor = UIColor.lightGray.withAlphaComponent(0.1)
     open var cellHeight: CGFloat = 45
+    open var cellTextColor = UIColor(red: 195 / 255.0, green: 195 / 255.0, blue: 195 / 255.0, alpha: 1.0)
+    open var cellTextFont = UIFont.systemFont(ofSize: 17, weight: .medium)
 	open var searchController: UISearchController = UISearchController(searchResultsController: nil)
 	open var didSelect: ((FPNCountry) -> Void)?
 
@@ -133,7 +143,12 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
         let cell = tableView.dequeueReusableCell(withIdentifier: "CountryTableViewCell", for: indexPath) as! CountryTableViewCell
 		
 		let country = getItem(at: indexPath)
-        cell.bind(country, shouldShowPhoneCode: showCountryPhoneCode)
+        cell.bind(
+            country,
+            shouldShowPhoneCode: showCountryPhoneCode,
+            cellTextColor: cellTextColor,
+            cellTextFont: cellTextFont
+        )
 
 		return cell
 	}
@@ -147,7 +162,13 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 
 		searchController.isActive = false
 		searchController.searchBar.resignFirstResponder()
-		dismiss(animated: true, completion: nil)
+        
+        // If this is root, dismiss, else pop
+        if navigationController?.viewControllers.count == 1 {
+            dismiss(animated: true)
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
 	}
     
     open override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
