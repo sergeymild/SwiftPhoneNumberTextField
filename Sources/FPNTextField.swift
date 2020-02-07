@@ -122,15 +122,18 @@ open class FPNTextField: UITextField {
 		leftView = UIView()
 		leftViewMode = .always
 		phoneCodeTextField.semanticContentAttribute = .forceLeftToRight
-        
+
         leftView?.addSubview(phoneCodeLabel)
         leftView?.addSubview(letfImageView)
 		leftView?.addSubview(flagButton)
 		leftView?.addSubview(phoneCodeTextField)
         
-        phoneCodeLabel.leftAnchor.constraint(equalTo: leftView!.leftAnchor, constant:  0).isActive = true
-        phoneCodeLabel.heightAnchor.constraint(equalTo: leftView!.heightAnchor, constant:  0).isActive = true
-        letfImageView.leftAnchor.constraint(equalTo: phoneCodeLabel.rightAnchor, constant: 10).isActive = true
+        phoneCodeLabel.leftAnchor.constraint(equalTo: leftView!.leftAnchor).isActive = true
+        phoneCodeLabel.rightAnchor.constraint(equalTo: letfImageView.leftAnchor, constant: -10).isActive = true
+        phoneCodeLabel.topAnchor.constraint(equalTo: leftView!.topAnchor).isActive = true
+        phoneCodeLabel.bottomAnchor.constraint(equalTo: leftView!.bottomAnchor).isActive = true
+        
+        letfImageView.rightAnchor.constraint(equalTo: phoneCodeTextField.leftAnchor, constant: -10).isActive = true
         letfImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
         letfImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
         letfImageView.centerYAnchor.constraint(equalTo: leftView!.centerYAnchor, constant: 0).isActive = true
@@ -139,7 +142,8 @@ open class FPNTextField: UITextField {
         flagButton.heightAnchor.constraint(equalTo: leftView!.heightAnchor, constant: 0).isActive = true
         flagButton.rightAnchor.constraint(equalTo: letfImageView.rightAnchor, constant: 0).isActive = true
         
-        phoneCodeTextField.leftAnchor.constraint(equalTo: flagButton.rightAnchor, constant: 16).isActive = true
+        phoneCodeTextField.widthAnchor.constraint(equalToConstant: 0).isActive = true
+//        phoneCodeTextField.leftAnchor.constraint(equalTo: flagButton.rightAnchor, constant: 16).isActive = true
         phoneCodeTextField.rightAnchor.constraint(equalTo: leftView!.rightAnchor, constant: 0).isActive = true
         
         phoneCodeTextField.topAnchor.constraint(equalTo: leftView!.topAnchor, constant: 0).isActive = true
@@ -152,15 +156,22 @@ open class FPNTextField: UITextField {
 		//flagWidthConstraint?.constant = flagButtonSize.width
 		//flagHeightConstraint?.constant = flagButtonSize.height
 	}
+    
+    /// The size of the leftView
+    private var leftViewSize: CGSize {
+        let width = (letfImageView.image?.size.width ?? 0) + getWidth(text: phoneCodeLabel.text!)
+        let height = bounds.height
+        return CGSize(width: width + 20, height: height)
+    }
 
-//	open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
-//		let size = leftViewSize
-//		let width: CGFloat = min(bounds.size.width, size.width)
-//		let height: CGFloat = min(bounds.size.height, size.height)
-//		let newRect: CGRect = CGRect(x: bounds.minX, y: bounds.minY, width: width, height: height)
-//
-//		return newRect
-//	}
+	open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+		let size = leftViewSize
+		let width: CGFloat = min(bounds.size.width, size.width)
+		let height: CGFloat = min(bounds.size.height, size.height)
+		let newRect: CGRect = CGRect(x: bounds.minX, y: bounds.minY, width: width, height: height)
+
+		return newRect
+	}
 
 	@objc private func displayCountries() {
 		(delegate as? FPNTextFieldDelegate)?.fpnDisplayCountryList()
@@ -349,16 +360,21 @@ open class FPNTextField: UITextField {
 	}
 
 	private func getWidth(text: String) -> CGFloat {
-		if let font = phoneCodeTextField.font {
-			let fontAttributes = [NSAttributedString.Key.font: font]
-			let size = (text as NSString).size(withAttributes: fontAttributes)
-
-			return size.width.rounded(.up)
-		} else {
-			phoneCodeTextField.sizeToFit()
-
-			return phoneCodeTextField.frame.size.width.rounded(.up)
-		}
+        let myText = text as NSString
+        
+        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: frame.height)
+        let boundingBox = text.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font : phoneCodeLabel.font!], context: nil)
+        
+        return ceil(boundingBox.width)
+//		if let font = phoneCodeLabel.font {
+//			let fontAttributes = [NSAttributedString.Key.font: UIFont(name: phoneCodeLabel.font.fontName , size: phoneCodeLabel.font.pointSize)!]
+//			let size = (text as NSString).size(withAttributes: fontAttributes)
+//
+//			return size.width.rounded(.up)
+//		} else {
+//			phoneCodeLabel.sizeToFit()
+//			return phoneCodeLabel.frame.size.width.rounded(.up)
+//		}
 	}
 
 	private func getValidNumber(phoneNumber: String) -> NBPhoneNumber? {
