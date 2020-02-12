@@ -206,16 +206,14 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 		}
 
 		if let searchText = searchController.searchBar.text, searchText.count > 0 {
-			results = countries.filter({(item: FPNCountry) -> Bool in
-				if item.name.lowercased().range(of: searchText.lowercased()) != nil {
-					return true
-				} else if item.code.rawValue.lowercased().range(of: searchText.lowercased()) != nil {
-					return true
-				} else if item.phoneCode.lowercased().range(of: searchText.lowercased()) != nil {
-					return true
-				}
-				return false
-			})
+            let lowerCased = searchText.lowercased()
+			results = countries.filter {
+                return $0.name.lowercased().range(of: lowerCased)
+                ?? $0.code.rawValue.lowercased().range(of: lowerCased)
+                ?? $0.phoneCode.lowercased().range(of: lowerCased)
+                ?? $0.code.rawValue.range(of: lowerCased)
+                != nil
+			}
 		}
 		tableView.reloadData()
 	}
