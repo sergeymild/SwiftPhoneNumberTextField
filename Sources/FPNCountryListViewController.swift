@@ -160,16 +160,24 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 
 		didSelect?(country)
 
-		searchController.isActive = false
-		searchController.searchBar.resignFirstResponder()
-        
-        // If this is root, dismiss, else pop
-        if navigationController?.viewControllers.count == 1 {
+        if searchController.isActive {
+            searchController.isActive = false
+            searchController.searchBar.resignFirstResponder()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.closeViewController()
+            }
+        } else {
+            closeViewController()
+        }
+	}
+    
+    private func closeViewController() {
+        if navigationController == nil {
             dismiss(animated: true)
         } else {
             navigationController?.popViewController(animated: true)
         }
-	}
+    }
     
     open override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
         tableView.cellForRow(at: indexPath)?.backgroundColor = cellHighlightColor
@@ -217,4 +225,8 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 	open func willDismissSearchController(_ searchController: UISearchController) {
 		results?.removeAll()
 	}
+    
+    deinit {
+        debugPrint("Deinit FPNCountryListViewController")
+    }
 }
