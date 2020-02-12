@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
 	s.name             = 'FlagPhoneNumber'
-	s.version          = '0.10.0'
-	s.summary          = 'A formatted phone number UITextField with country flag picker.'
+	s.version          = '0.11.0'
+	s.summary          = 'A formatted phone number UITextField picker.'
 
 	# This description is used to generate tags and improve search results.
 	#   * Think: What does it do? Why did you write it? What is the focus?
@@ -21,10 +21,10 @@ Pod::Spec.new do |s|
 	FlagPhoneNumber is a phone number textfield that allows you to choose the country code thanks to a picker. It uses libPhoneNumber to format the number in the textfield according to country code.
 	DESC
 
-	s.homepage         = 'https://github.com/chronotruck/FlagPhoneNumber'
+	s.homepage         = 'https://github.com/sergeymild/SwiftPhoneNumberTextField'
 	s.license          = { :type => 'Apache License 2.0', :file => 'LICENSE' }
-	s.author           = { 'Aurélien Grifasi' => 'aurelien.grifasi@chronotruck.com' }
-	s.source           = { :git => 'https://github.com/chronotruck/FlagPhoneNumber.git', :tag => s.version.to_s }
+	s.author           = { 'Sergey Mild' => 'sergeymild@yandex.ru' }
+	s.source           = { :git => 'https://github.com/sergeymild/SwiftPhoneNumberTextField.git', :tag => s.version.to_s }
 
 	s.ios.deployment_target = '10.0'
 	s.source_files = 'Sources/**/*.swift'
