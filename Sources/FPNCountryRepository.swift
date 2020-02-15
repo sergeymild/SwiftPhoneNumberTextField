@@ -39,8 +39,10 @@ open class FPNCountryRepository {
 					guard let countryObj = jsonObject as? NSDictionary else { return countries }
 					guard let code = countryObj["code"] as? String, let phoneCode = countryObj["dial_code"] as? String, let name = countryObj["name"] as? String else { return countries }
 
-
-					let country = FPNCountry(code: code, name: locale.localizedString(forRegionCode: code) ?? name, phoneCode: phoneCode)
+                    let country = FPNCountry(
+                        code: FPNCountryCode(rawValue: code)!,
+                        name: locale.localizedString(forRegionCode: code) ?? name,
+                        phoneCode: phoneCode)
 
 					countries.append(country)
 				}

@@ -7,8 +7,8 @@
 #
 
 Pod::Spec.new do |s|
-	s.name             = 'FlagPhoneNumber'
-	s.version          = '0.11.0'
+	s.name             = 'SwiftPhoneNumberTextField'
+	s.version          = '0.12.0'
 	s.summary          = 'A formatted phone number UITextField picker.'
 
 	# This description is used to generate tags and improve search results.

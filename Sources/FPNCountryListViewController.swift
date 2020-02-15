@@ -94,6 +94,11 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 		initSearchBarController()
         tableView.backgroundColor = tableBackgroundColor
 	}
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
 
 	open func setup(repository: FPNCountryRepository) {
 		self.repository = repository
