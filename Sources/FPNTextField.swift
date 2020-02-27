@@ -1,45 +1,41 @@
-//
-//  FlagPhoneNumberTextField.swift
-//  FlagPhoneNumber
-//
-//  Created by Aurélien Grifasi on 06/08/2017.
-//  Copyright (c) 2017 Aurélien Grifasi. All rights reserved.
-//
 
 import UIKit
 
-open class FPNTextField: UITextField {
-
-	/// The size of the flag button
-	@objc open var flagButtonSize: CGSize = CGSize(width: 32, height: 32) {
-		didSet {
-			layoutIfNeeded()
-		}
-	}
-
-	private var flagWidthConstraint: NSLayoutConstraint?
-	private var flagHeightConstraint: NSLayoutConstraint?
-
-	private var phoneCodeTextField: UITextField = UITextField()
+open class FPNTextField: UIView {
+    private lazy var selectCountryListController: FPNCountryListViewController = {
+        let controller = FPNCountryListViewController()
+        controller.setup(repository: self.countryRepository)
+        controller.didSelect = { [weak self] country in
+            self?.setFlag(countryCode: country.code)
+        }
+        return controller
+    }()
+    
+    let button = UIButton()
+    let rightView = UIView()
+	public var textField: UITextField = UITextField()
 
 	private lazy var phoneUtil: NBPhoneNumberUtil = NBPhoneNumberUtil()
 	private var nbPhoneNumber: NBPhoneNumber?
 	private var formatter: NBAsYouTypeFormatter?
-
-	open var flagButton: UIButton = ButtonWithImage()
     
-    public let phoneCodeLabel = UILabel()
-    public let letfImageView = UIImageView()
+    public let codeLabel = UILabel()
+    public let arrowIcon = UIImageView()
+    
+    public var delegate: FPNTextFieldDelegate? {
+        get { (textField.delegate as? FPNTextFieldDelegate) }
+        set { textField.delegate = newValue }
+    }
 
-	open override var font: UIFont? {
+	open var font: UIFont? {
 		didSet {
-			phoneCodeTextField.font = font
+			textField.font = font
 		}
 	}
 
-	open override var textColor: UIColor? {
+	open var textColor: UIColor? {
 		didSet {
-			phoneCodeTextField.textColor = textColor
+			textField.textColor = textColor
 		}
 	}
 
@@ -48,7 +44,7 @@ open class FPNTextField: UITextField {
 	@objc open var hasPhoneNumberExample: Bool = true {
 		didSet {
 			if hasPhoneNumberExample == false {
-				placeholder = nil
+                textField.placeholder = nil
 			}
 			updatePlaceholder()
 		}
@@ -84,15 +80,9 @@ open class FPNTextField: UITextField {
 	}
 
 	private func setup() {
-		leftViewMode = .always
-
 		setupFlagButton()
 		setupPhoneCodeTextField()
 		setupLeftView()
-
-		keyboardType = .numberPad
-		autocorrectionType = .no
-		addTarget(self, action: #selector(didEditText), for: .editingChanged)
 
 		if let regionCode = Locale.current.regionCode, let countryCode = FPNCountryCode(rawValue: regionCode) {
 			setFlag(countryCode: countryCode)
@@ -102,90 +92,73 @@ open class FPNTextField: UITextField {
 	}
 
 	private func setupFlagButton() {
-		flagButton.accessibilityLabel = "flagButton"
-		flagButton.addTarget(self, action: #selector(displayCountries), for: .touchUpInside)
-		flagButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        phoneCodeLabel.translatesAutoresizingMaskIntoConstraints = false
-        letfImageView.translatesAutoresizingMaskIntoConstraints = false
-        letfImageView.contentMode = .scaleAspectFit
-        letfImageView.image = UIImage(named: "Arrow", in: Bundle.flagIcons, compatibleWith: nil)
+        arrowIcon.contentMode = .scaleAspectFit
+        arrowIcon.image = UIImage(named: "Arrow", in: Bundle.current, compatibleWith: nil)
 	}
 
 	private func setupPhoneCodeTextField() {
-		phoneCodeTextField.font = font
-		phoneCodeTextField.isUserInteractionEnabled = false
-		phoneCodeTextField.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(textField)
+        
+        textField.keyboardType = .numberPad
+        textField.autocorrectionType = .no
+        textField.addTarget(
+            self,
+            action: #selector(didEditText),
+            for: .editingChanged
+        )
+        
+		textField.font = font
 	}
 
 	private func setupLeftView() {
-		leftView = UIView()
-		leftViewMode = .always
-		phoneCodeTextField.semanticContentAttribute = .forceLeftToRight
-
-        leftView?.addSubview(phoneCodeLabel)
-        leftView?.addSubview(letfImageView)
-		leftView?.addSubview(flagButton)
-		leftView?.addSubview(phoneCodeTextField)
-        
-        phoneCodeLabel.leftAnchor.constraint(equalTo: leftView!.leftAnchor).isActive = true
-        phoneCodeLabel.rightAnchor.constraint(equalTo: letfImageView.leftAnchor, constant: -10).isActive = true
-        phoneCodeLabel.topAnchor.constraint(equalTo: leftView!.topAnchor).isActive = true
-        phoneCodeLabel.bottomAnchor.constraint(equalTo: leftView!.bottomAnchor).isActive = true
-        
-        letfImageView.rightAnchor.constraint(equalTo: phoneCodeTextField.leftAnchor, constant: -10).isActive = true
-        letfImageView.widthAnchor.constraint(equalToConstant: 12).isActive = true
-        letfImageView.heightAnchor.constraint(equalToConstant: 12).isActive = true
-        letfImageView.centerYAnchor.constraint(equalTo: leftView!.centerYAnchor, constant: 0).isActive = true
-
-        flagButton.leftAnchor.constraint(equalTo: phoneCodeLabel.leftAnchor).isActive = true
-        flagButton.topAnchor.constraint(equalTo: leftView!.topAnchor).isActive = true
-        flagButton.bottomAnchor.constraint(equalTo: leftView!.bottomAnchor).isActive = true
-        flagButton.rightAnchor.constraint(equalTo: letfImageView.rightAnchor).isActive = true
-        
-        phoneCodeTextField.widthAnchor.constraint(equalToConstant: 0).isActive = true
-        phoneCodeTextField.rightAnchor.constraint(equalTo: leftView!.rightAnchor, constant: 0).isActive = true
-        
-        phoneCodeTextField.topAnchor.constraint(equalTo: leftView!.topAnchor, constant: 0).isActive = true
-        phoneCodeTextField.bottomAnchor.constraint(equalTo: leftView!.bottomAnchor, constant: 0).isActive = true
-	}
-
-	open override func updateConstraints() {
-		super.updateConstraints()
-
-		//flagWidthConstraint?.constant = flagButtonSize.width
-		//flagHeightConstraint?.constant = flagButtonSize.height
+        addSubview(codeLabel)
+        addSubview(arrowIcon)
+        addSubview(button)
+        button.addTarget(self, action: #selector(displayCountries), for: .touchUpInside)
 	}
     
-    /// The size of the leftView
-    private var leftViewSize: CGSize {
-        let width = (letfImageView.image?.size.width ?? 0) + getWidth(text: phoneCodeLabel.text!)
-        let height = bounds.height
-        return CGSize(width: width + 20, height: height)
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        let w = codeLabel.intrinsicContentSize.width
+        
+        codeLabel.frame = .init(x: 0, y: 0, width: w, height: frame.height)
+        arrowIcon.frame = .init(x: w + 10, y: 0, width: 12, height: frame.height)
+        
+        button.frame = .init(
+            x: 0,
+            y: 0,
+            width: codeLabel.frame.width + 20 + 12,
+            height: frame.height
+        )
+        
+        textField.frame = .init(
+            x: arrowIcon.frame.maxX + 10,
+            y: 0,
+            width: frame.width - (arrowIcon.frame.maxX + 10),
+            height: frame.height)
     }
-
-	open override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
-		let size = leftViewSize
-		let width: CGFloat = min(bounds.size.width, size.width)
-		let height: CGFloat = min(bounds.size.height, size.height)
-		let newRect: CGRect = CGRect(x: bounds.minX, y: bounds.minY, width: width, height: height)
-
-		return newRect
-	}
-
-	@objc private func displayCountries() {
-		(delegate as? FPNTextFieldDelegate)?.fpnDisplayCountryList()
+   
+	@objc
+    private func displayCountries() {
+        delegate?.fpnDisplay(
+            selectCountryListController: selectCountryListController
+        )
 	}
 
 	@objc private func dismissCountries() {
 		resignFirstResponder()
-		inputView = nil
-		inputAccessoryView = nil
+        textField.inputView = nil
+        textField.inputAccessoryView = nil
 		reloadInputViews()
 	}
 
 	private func fpnDidSelect(country: FPNCountry) {
-		(delegate as? FPNTextFieldDelegate)?.fpnDidSelectCountry(name: country.name, dialCode: country.phoneCode, code: country.code.rawValue)
+        delegate?.fpnDidSelectCountry?(
+            name: country.name,
+            dialCode: country.phoneCode,
+            code: country.code.rawValue
+        )
 		selectedCountry = country
 	}
 
@@ -220,9 +193,9 @@ open class FPNTextField: UITextField {
 
 		if let validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber) {
 			if validPhoneNumber.italianLeadingZero {
-				text = "0\(validPhoneNumber.nationalNumber.stringValue)"
+                textField.text = "0\(validPhoneNumber.nationalNumber.stringValue)"
 			} else {
-				text = validPhoneNumber.nationalNumber.stringValue
+                textField.text = validPhoneNumber.nationalNumber.stringValue
 			}
 			setFlag(countryCode: FPNCountryCode(rawValue: phoneUtil.getRegionCode(for: validPhoneNumber))!)
 		}
@@ -236,14 +209,6 @@ open class FPNTextField: UITextField {
 			if country.code == countryCode {
 				return fpnDidSelect(country: country)
 			}
-		}
-	}
-
-	/// Set the country image according to country code. Example "FR"
-	@objc open func setFlag(key: FPNOBJCCountryKey) {
-		if let code = FPNOBJCCountryCode[key], let countryCode = FPNCountryCode(rawValue: code) {
-
-			setFlag(countryCode: countryCode)
 		}
 	}
 
@@ -269,34 +234,8 @@ open class FPNTextField: UITextField {
 		}
 	}
 
-	/// Set the country list excluding the provided countries
-	@objc open func setCountries(excluding countries: [Int]) {
-		let countryCodes: [FPNCountryCode] = countries.compactMap({ index in
-			if let key = FPNOBJCCountryKey(rawValue: index), let code = FPNOBJCCountryCode[key], let countryCode = FPNCountryCode(rawValue: code) {
-				return countryCode
-			}
-			return nil
-		})
-
-		countryRepository.setup(without: countryCodes)
-	}
-
-	/// Set the country list including the provided countries
-	@objc open func setCountries(including countries: [Int]) {
-		let countryCodes: [FPNCountryCode] = countries.compactMap({ index in
-			if let key = FPNOBJCCountryKey(rawValue: index), let code = FPNOBJCCountryCode[key], let countryCode = FPNCountryCode(rawValue: code) {
-				return countryCode
-			}
-			return nil
-		})
-
-		countryRepository.setup(with: countryCodes)
-	}
-
-	// Private
-
 	@objc private func didEditText() {
-		if let phoneCode = selectedCountry?.phoneCode, let number = text {
+        if let phoneCode = selectedCountry?.phoneCode, let number = textField.text {
 			var cleanedPhoneNumber = clean(string: number)
 
 			if let validPhoneNumber = getValidNumber(phoneNumber: cleanedPhoneNumber) {
@@ -305,18 +244,18 @@ open class FPNTextField: UITextField {
 				cleanedPhoneNumber = validPhoneNumber.nationalNumber.stringValue
 
 				if let inputString = formatter?.inputString(cleanedPhoneNumber) {
-					text = remove(dialCode: phoneCode, in: inputString)
+                    textField.text = remove(dialCode: phoneCode, in: inputString)
 				}
-				(delegate as? FPNTextFieldDelegate)?.fpnDidValidatePhoneNumber(textField: self, isValid: true)
+                delegate?.fpnDidValidatePhoneNumber(isValid: true)
 			} else {
 				nbPhoneNumber = nil
 
 				if let dialCode = selectedCountry?.phoneCode {
 					if let inputString = formatter?.inputString(cleanedPhoneNumber) {
-						text = remove(dialCode: dialCode, in: inputString)
+                        textField.text = remove(dialCode: dialCode, in: inputString)
 					}
 				}
-				(delegate as? FPNTextFieldDelegate)?.fpnDidValidatePhoneNumber(textField: self, isValid: false)
+                delegate?.fpnDidValidatePhoneNumber(isValid: false)
 			}
 		}
 	}
@@ -342,7 +281,8 @@ open class FPNTextField: UITextField {
 		//flagButton.setImage(selectedCountry?.flag, for: .normal)
         
         if let selected = selectedCountry {
-            phoneCodeLabel.text = "\(selected.code.rawValue) \(selected.phoneCode)"
+            codeLabel.text = "\(selected.code.rawValue) \(selected.phoneCode)"
+            layoutSubviews()
         }
 
 		if hasPhoneNumberExample == true {
@@ -353,28 +293,9 @@ open class FPNTextField: UITextField {
 
 	private func clean(string: String) -> String {
 		let allowedCharactersSet = CharacterSet.decimalDigits
-
-		//allowedCharactersSet.insert("+")
-
-		return string.components(separatedBy: allowedCharactersSet.inverted).joined(separator: "")
-	}
-
-	private func getWidth(text: String) -> CGFloat {
-        let myText = text as NSString
-        
-        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: frame.height)
-        let boundingBox = text.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [.font : phoneCodeLabel.font!], context: nil)
-        
-        return ceil(boundingBox.width)
-//		if let font = phoneCodeLabel.font {
-//			let fontAttributes = [NSAttributedString.Key.font: UIFont(name: phoneCodeLabel.font.fontName , size: phoneCodeLabel.font.pointSize)!]
-//			let size = (text as NSString).size(withAttributes: fontAttributes)
-//
-//			return size.width.rounded(.up)
-//		} else {
-//			phoneCodeLabel.sizeToFit()
-//			return phoneCodeLabel.frame.size.width.rounded(.up)
-//		}
+		return string.components(
+            separatedBy: allowedCharactersSet.inverted
+        ).joined(separator: "")
 	}
 
 	private func getValidNumber(phoneNumber: String) -> NBPhoneNumber? {
@@ -418,15 +339,15 @@ open class FPNTextField: UITextField {
 				let phoneNumber = example.nationalNumber.stringValue
 
 				if let inputString = formatter?.inputString(phoneNumber) {
-					placeholder = inputString
+                    textField.placeholder = inputString
 				} else {
-					placeholder = nil
+                    textField.placeholder = nil
 				}
 			} catch _ {
-				placeholder = nil
+                textField.placeholder = nil
 			}
 		} else {
-			placeholder = nil
+            textField.placeholder = nil
 		}
 	}
 }

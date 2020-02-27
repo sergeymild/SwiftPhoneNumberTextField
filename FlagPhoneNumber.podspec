@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
 	s.name             = 'FlagPhoneNumber'
-	s.version          = '0.12.0'
+	s.version          = '0.13.0'
 	s.summary          = 'A formatted phone number UITextField picker.'
 
 	# This description is used to generate tags and improve search results.
@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
 	s.author           = { 'Sergey Mild' => 'sergeymild@yandex.ru' }
 	s.source           = { :git => 'https://github.com/sergeymild/SwiftPhoneNumberTextField.git', :tag => s.version.to_s }
 
-	s.ios.deployment_target = '10.0'
+	s.ios.deployment_target = '11.0'
 	s.source_files = 'Sources/**/*.swift'
 	s.resource_bundles = {'FlagPhoneNumber' => ['Sources/Resources/**/*']}
 	s.swift_version = '5.0'

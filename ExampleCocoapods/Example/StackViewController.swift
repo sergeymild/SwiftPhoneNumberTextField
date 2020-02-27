@@ -1,27 +1,17 @@
-//
-//  StackViewController.swift
-//  FlagPhoneNumber_Example
-//
-//  Created by Aurelien on 24/12/2018.
-//  Copyright © 2018 CocoaPods. All rights reserved.
-//
 
 import UIKit
 import FlagPhoneNumber
 
 class StackViewController: UIViewController {
-    
-    var listController = FPNCountryListViewController(style: .grouped)
 
 	lazy var phoneEditTextField: FPNTextField = {
         let editText = FPNTextField()
+        editText.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         editText.hasPhoneNumberExample = true
+        editText.codeLabel.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
         editText.delegate = self
+
         
-        listController.setup(repository: editText.countryRepository)
-        listController.didSelect = { country in
-            editText.setFlag(countryCode: country.code)
-        }
         
         return editText
     }()
@@ -32,7 +22,7 @@ class StackViewController: UIViewController {
 		title = "In Stack View"
 		view.backgroundColor = UIColor.groupTableViewBackground
         view.addSubview(phoneEditTextField)
-		phoneEditTextField.delegate = self
+		//phoneEditTextField.delegate = self
 	}
     
     override func viewWillLayoutSubviews() {
@@ -45,13 +35,13 @@ class StackViewController: UIViewController {
 
 extension StackViewController: FPNTextFieldDelegate {
 
-	func fpnDisplayCountryList() {
-        navigationController?.pushViewController(listController, animated: true)
+    func fpnDisplay(selectCountryListController: UIViewController) {
+        navigationController?.pushViewController(selectCountryListController, animated: true)
     }
 
-	func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
-		textField.rightViewMode = .always
-		textField.rightView = UIImageView(image: isValid ? #imageLiteral(resourceName: "success") : #imageLiteral(resourceName: "error"))
+	func fpnDidValidatePhoneNumber(isValid: Bool) {
+		//textField.rightViewMode = .always
+		//textField.rightView = UIImageView(image: isValid ? #imageLiteral(resourceName: "success") : #imageLiteral(resourceName: "error"))
 
 		print(isValid)
 	}

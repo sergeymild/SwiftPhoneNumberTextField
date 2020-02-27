@@ -1,9 +1,3 @@
-//
-//  FPNCountryRepository.swift
-//  FlagPhoneNumber
-//
-//  Created by Aurelien on 21/11/2019.
-//
 
 import Foundation
 
@@ -20,9 +14,8 @@ open class FPNCountryRepository {
 
 	// Populates the metadata from the included json file resource
 	private func getAllCountries() -> [FPNCountry] {
-		let bundle: Bundle = Bundle.flagPhoneNumber()
 		let resource: String = "countryCodes"
-		let jsonPath = bundle.path(forResource: resource, ofType: "json")
+		let jsonPath = Bundle.current.path(forResource: resource, ofType: "json")
 
 		assert(jsonPath != nil, "Resource file is not found in the Bundle")
 

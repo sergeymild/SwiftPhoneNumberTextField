@@ -1,10 +1,3 @@
-//
-//  FPNCountryListViewController.swift
-//  FlagPhoneNumber
-//
-//  Created by Aurélien Grifasi on 06/08/2017.
-//  Copyright (c) 2017 Aurélien Grifasi. All rights reserved.
-//
 
 import UIKit
 
@@ -109,17 +102,10 @@ open class FPNCountryListViewController: UITableViewController, UISearchResultsU
 		searchController.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
 
-		if #available(iOS 11.0, *) {
-			navigationItem.searchController = searchController
-			navigationItem.hidesSearchBarWhenScrolling = false
-		} else {
-			searchController.dimsBackgroundDuringPresentation = false
-			searchController.hidesNavigationBarDuringPresentation = true
-			searchController.definesPresentationContext = true
-
-			//				searchController.searchBar.sizeToFit()
-			tableView.tableHeaderView = searchController.searchBar
-		}
+        definesPresentationContext = true
+        searchController.obscuresBackgroundDuringPresentation = false
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
 		definesPresentationContext = true
 	}
 

@@ -1,9 +1,3 @@
-//
-//  FPNCountryCode.swift
-//  FlagPhoneNumber
-//
-//  Created by Aurelien on 20/05/2019.
-//
 
 import Foundation
 
