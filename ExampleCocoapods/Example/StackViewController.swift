@@ -43,7 +43,7 @@ extension StackViewController: FPNTextFieldDelegate {
 		//textField.rightViewMode = .always
 		//textField.rightView = UIImageView(image: isValid ? #imageLiteral(resourceName: "success") : #imageLiteral(resourceName: "error"))
 
-		print(isValid)
+        print(isValid, phoneEditTextField.getRawPhoneNumber(shouldIncludeCode: true))
 	}
 
 	func fpnDidSelectCountry(name: String, dialCode: String, code: String) {

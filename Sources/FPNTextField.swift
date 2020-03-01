@@ -178,13 +178,19 @@ open class FPNTextField: UIView {
 	}
 
 	/// Get the current raw phone number
-	@objc open func getRawPhoneNumber() -> String? {
+	@objc
+    open func getRawPhoneNumber(shouldIncludeCode: Bool = false) -> String? {
 		let phoneNumber = getFormattedPhoneNumber(format: .E164)
+        
+        if shouldIncludeCode {
+            return phoneNumber?.replacingOccurrences(of: "+", with: "")
+        }
+        
 		var nationalNumber: NSString?
 
-		phoneUtil.extractCountryCode(phoneNumber, nationalNumber: &nationalNumber)
+        phoneUtil.extractCountryCode(phoneNumber, nationalNumber: &nationalNumber)
 
-		return nationalNumber as String?
+        return (nationalNumber as String?)
 	}
 
 	/// Set directly the phone number. e.g "+33612345678"
